@@ -1,23 +1,26 @@
 #cloud-config
 autoinstall:
   version: 1
+
+  # Configuração de identidade do sistema
   identity:
     realname: "FALCON"
     hostname: ubuntu
     username: falcon
-                                                #pw: '4180'
     password: "$6$yFYcLAK8ihV62raf$9Ftb1sluQcqc8pQl84erqBHNRl//4XIQy9H9vxBSNkXoXEALh3eCmApwCm3U/2DcjAn/GcYOPu4bYYqfep0hy0"
 
-
+  # Configurações regionais
   locale: pt_BR.UTF-8
   keyboard:
     layout: br
   timezone: America/Sao_Paulo
 
+  # Fonte da instalação do Ubuntu
   source:
     id: ubuntu-desktop-minimal
     search_drivers: true
 
+  # Configuração do gerenciador de pacotes (APT)
   apt:
     geoip: true
     preferences:
@@ -30,10 +33,19 @@ autoinstall:
     security:
       - uri: "https://security.ubuntu.com/ubuntu"
     sources:
+      # Repositório do Google Chrome
       chrome:
         source: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
+      
+      # PPAs para drivers AMD
+      amd-drivers:
+        source: "ppa:oibaf/graphics-drivers"
+      amd-mesa:
+        source: "ppa:kisak/kisak-mesa"
 
+  # Pacotes a serem instalados via APT
   packages:
+    # Utilitários essenciais
     - git
     - curl
     - wget
@@ -42,17 +54,31 @@ autoinstall:
     - btop
     - neofetch
     - python3
+
+    # Programas multimídia
     - vlc
     - gimp
     - kdenlive
     - obs-studio
     - qbittorrent
+
+    # Personalização do GNOME
     - gnome-tweaks
     - gnome-shell-extensions
     - gnome-shell-extension-dash-to-panel
+
+    # Codecs multimídia
     - libavcodec-extra
     - ubuntu-restricted-extras
 
+    # Drivers AMD (chipset B350 + GPU RX 580)
+    - mesa-utils
+    - mesa-vulkan-drivers
+    - libvulkan1
+    - firmware-amd-graphics
+    - xserver-xorg-video-amdgpu
+
+  # Pacotes a serem instalados via Snap
   snaps:
     - name: steam
       channel: stable
@@ -64,28 +90,28 @@ autoinstall:
       channel: stable
       classic: false
 
+  # Instalar codecs e drivers automaticamente
   codecs:
     install: true
-
   drivers:
     install: true
 
-  # Configuração pós-instalação
+  # Comandos pós-instalação
   late-commands:
-    # Configura Plex Media Server
+    # Configuração do Plex Media Server
     - curtin in-target -- systemctl enable plexmediaserver.service
     - curtin in-target -- usermod -aG media falcon
     - curtin in-target -- chown -R plex:plex /home/PLEX
     - curtin in-target -- chmod -R 775 /home/PLEX
     - curtin in-target -- systemctl restart plexmediaserver.service
-    
-    # Atualizações finais
+
+    # Atualizações finais do sistema
     - curtin in-target -- sudo apt update && sudo apt upgrade -y
     - curtin in-target -- sudo apt autoremove -y
     - curtin in-target -- sudo apt clean
 
-    #ubuntu-pro:
-    #   token: C124KQDBy6R8rPWt8tTkDBE4fRy2iw
-
+  # Atualizações do sistema
   updates: all
+
+  # Reiniciar após a instalação
   shutdown: reboot
