@@ -1,0 +1,91 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    realname: "FALCON"
+    hostname: ubuntu
+    username: falcon
+                                                #pw: '4180'
+    password: "$6$yFYcLAK8ihV62raf$9Ftb1sluQcqc8pQl84erqBHNRl//4XIQy9H9vxBSNkXoXEALh3eCmApwCm3U/2DcjAn/GcYOPu4bYYqfep0hy0"
+
+
+  locale: pt_BR.UTF-8
+  keyboard:
+    layout: br
+  timezone: America/Sao_Paulo
+
+  source:
+    id: ubuntu-desktop-minimal
+    search_drivers: true
+
+  apt:
+    geoip: true
+    preferences:
+      - package: "*"
+        pin: "release a=jammy-security"
+        pin-priority: 200
+    primary:
+      - arches: [amd64]
+        uri: "https://mirror.uepg.br/ubuntu"
+    security:
+      - uri: "https://security.ubuntu.com/ubuntu"
+    sources:
+      chrome:
+        source: "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main"
+
+  packages:
+    - git
+    - curl
+    - wget
+    - gdebi
+    - xorriso
+    - btop
+    - neofetch
+    - python3
+    - vlc
+    - gimp
+    - kdenlive
+    - obs-studio
+    - qbittorrent
+    - gnome-tweaks
+    - gnome-shell-extensions
+    - gnome-shell-extension-dash-to-panel
+    - libavcodec-extra
+    - ubuntu-restricted-extras
+
+  snaps:
+    - name: steam
+      channel: stable
+      classic: true
+    - name: discord
+      channel: stable
+      classic: true
+    - name: plexmediaserver
+      channel: stable
+      classic: false
+
+  codecs:
+    install: true
+
+  drivers:
+    install: true
+
+  # Configuração pós-instalação
+  late-commands:
+    # Configura Plex Media Server
+    - curtin in-target -- systemctl enable plexmediaserver.service
+    - curtin in-target -- usermod -aG media falcon
+    - curtin in-target -- chown -R plex:plex /home/PLEX
+    - curtin in-target -- chmod -R 775 /home/PLEX
+    - curtin in-target -- systemctl restart plexmediaserver.service
+    
+    # Atualizações finais
+    - curtin in-target -- sudo apt update && sudo apt upgrade -y
+    - curtin in-target -- sudo apt autoremove -y
+    - curtin in-target -- sudo apt clean
+
+    #ubuntu-pro:
+    #   token: C124KQDBy6R8rPWt8tTkDBE4fRy2iw
+
+  updates: all
+  shutdown: reboot
