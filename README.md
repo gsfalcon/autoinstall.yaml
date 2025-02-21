@@ -13,7 +13,7 @@ This repository contains an **automated installation script** (`autoinstall.yaml
 1. Boot into the Ubuntu installer.
 2. Select **Autoinstall** and provide the following URL:
    ```
-   https://raw.githubusercontent.com/gsfalcon/Ubuntu/main/autoinstall.yaml
+   https://gsfalcon.github.io/Ubuntu/autoinstall.yaml
    ```
 3. The installation will begin automatically!
 
